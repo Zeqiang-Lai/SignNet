@@ -44,7 +44,7 @@ if __name__ == '__main__':
         elif k % 256 == 32:
             # SPACE pressed
             img_name = "opencv_frame_{}.png".format(img_counter)
-            cv2.imwrite(img_name, frame)
+            cv2.imwrite(img_name, gray)
             print("{} written!".format(img_name))
             img_counter += 1
 
