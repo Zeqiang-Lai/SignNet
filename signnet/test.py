@@ -1,46 +1,71 @@
+from __future__ import print_function
+
+import argparse
+import os
+
 import torch
+import torch.nn.functional as F
+from torchvision import datasets, transforms
 
 from model import vgg11
-import cv2
-import numpy as np
-
-classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-           'W', 'X', 'Y', 'Z', 'del', 'nothing', 'space']
-class2idx = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
-             'N': 13, 'O': 14, 'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24,
-             'Z': 25, 'del': 26, 'nothing': 27, 'space': 28}
-
-idx2class = dict((v, k) for k, v in class2idx.items())
 
 
-def inference(img):
-    """
-    Perform inference on img
-    :param img: opencv format [height, width, channel]
-    :return:
-    """
-    model = vgg11()
-    model.load_state_dict(torch.load('./gesture_cnn.pt', map_location=torch.device('cpu')))
+# 需要去掉测试集中几张200*150的图片,否则会报错,这些图片位于C这个类别中.
+
+def test(model, device, test_loader):
     model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            test_loss += F.cross_entropy(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
-    # Pytorch require B, C, H, W
-    torch_img = np.transpose(img, (2, 0, 1))
-    torch_img = torch.tensor([torch_img], dtype=torch.float32)
-    print(torch_img.shape)
-    out = model(torch_img)
-    print(out.shape)
-    label = torch.argmax(out, 1)
-    print(label.shape)
-    return label.item()
+    test_loss /= len(test_loader.dataset)
+
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        test_loss, correct, len(test_loader.dataset),
+        100. * correct / len(test_loader.dataset)))
 
 
 if __name__ == '__main__':
-    # path = 'data/asl_alphabet_train/asl_alphabet_train/C/C8.jpg'
-    # path = 'opencv_frame_6.png'
-    path = 'data/asl_alphabet_test/asl_alphabet_test/B/B_test.jpg'
-    img = cv2.imread(path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.normalize(img, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-    label = inference(img)
-    print(label)
-    print(idx2class[label])
+    parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                        help='input batch size for training (default: 64)')
+    parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
+                        help='input batch size for testing (default: 1000)')
+    parser.add_argument('--no-cuda', action='store_true', default=False,
+                        help='disables CUDA training')
+    parser.add_argument('--data-path', type=str, default='./data',
+                        help='Where the asl alphabet dataset is')
+    args = parser.parse_args()
+    use_cuda = not args.no_cuda and torch.cuda.is_available()
+
+    device = torch.device("cuda" if use_cuda else "cpu")
+
+    test_kwargs = {'batch_size': args.test_batch_size}
+
+    if use_cuda:
+        cuda_kwargs = {'num_workers': 1,
+                       'pin_memory': True,
+                       'shuffle': True}
+        test_kwargs.update(cuda_kwargs)
+
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        # transforms.Normalize((0.1307,), (0.3081,))
+    ])
+    test_dataset_path = os.path.join(args.data_path, 'asl-alphabet-test')
+
+    dataset2 = datasets.ImageFolder(root=test_dataset_path, transform=transform)
+
+    test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
+
+    model = vgg11().to(device)
+
+    model.load_state_dict(torch.load('./gesture_cnn.pt', map_location=device))
+
+    test(model, device, test_loader)

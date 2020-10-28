@@ -1,12 +1,13 @@
 from __future__ import print_function
+
 import argparse
+import os
+
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-import os
+from torchvision import datasets, transforms
 
 from model import vgg11
 
@@ -56,8 +57,8 @@ def main():
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
-                        help='learning rate (default: 1e-3)')
+    parser.add_argument('--lr', type=float, default=0.0001, metavar='LR',
+                        help='learning rate (default: 1e-4)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -93,7 +94,7 @@ def main():
         # transforms.Normalize((0.1307,), (0.3081,))
     ])
     train_dataset_path = os.path.join(args.data_path, 'asl_alphabet_train/asl_alphabet_train')
-    test_dataset_path = os.path.join(args.data_path, 'asl_alphabet_test/asl_alphabet_test')
+    test_dataset_path = os.path.join(args.data_path, 'asl_alphabet_val/asl_alphabet_val')
 
     dataset1 = datasets.ImageFolder(root=train_dataset_path, transform=transform)
     dataset2 = datasets.ImageFolder(root=test_dataset_path, transform=transform)
