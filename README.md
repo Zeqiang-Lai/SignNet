@@ -24,7 +24,7 @@ Beijing Institute of Technology
 
 ## Datasets
 
-The pretrained model was trained with [ASL Alphabet](https://www.kaggle.com/grassknoted/asl-alphabet) dataset.
+The pretrained model was trained with [ASL Alphabet](https://www.kaggle.com/grassknoted/asl-alphabet) dataset, and there is another supplementary  [ASL Alphabet Test](https://www.kaggle.com/danrasband/asl-alphabet-test/home) dataset for testing.
 
 ## To Do
 
