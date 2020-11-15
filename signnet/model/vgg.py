@@ -32,7 +32,7 @@ class VGG(nn.Module):
 
 def make_layers(cfg, batch_norm=False):
     layers = []
-    in_channels = 3
+    in_channels = 1
     for v in cfg:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
@@ -48,7 +48,7 @@ def make_layers(cfg, batch_norm=False):
 
 cfg = {
     'F': [16, 'M', 32, 'M', 64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
+    'A': [32, 'M', 64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
     'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M',
@@ -58,4 +58,8 @@ cfg = {
 
 def vgg11():
     """VGG 11-layer model (configuration "A")"""
-    return VGG(make_layers(cfg['F']))
+    return VGG(make_layers(cfg['A']))
+
+
+if __name__ == '__main__':
+    print(vgg11())

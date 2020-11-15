@@ -6,6 +6,7 @@ import os
 import torch
 import torch.nn.functional as F
 from torchvision import datasets, transforms
+import torchvision
 
 from model import vgg11
 
@@ -23,6 +24,14 @@ def test(model, device, test_loader):
             test_loss += F.cross_entropy(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
+
+            # data: B, 1, 64, 64
+            cools = []
+            for idx, i in enumerate(pred.eq(target.view_as(pred))):
+                if i.item():
+                    cools.append(data[idx])
+            image = torchvision.utils.make_grid(cools)
+            torchvision.utils.save_image(image, 'cool.jpg')
 
     test_loss /= len(test_loader.dataset)
 
@@ -55,8 +64,10 @@ if __name__ == '__main__':
         test_kwargs.update(cuda_kwargs)
 
     transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.Grayscale(),
+        transforms.Resize((64, 64)),
         transforms.ToTensor(),
-        # transforms.Normalize((0.1307,), (0.3081,))
     ])
     test_dataset_path = os.path.join(args.data_path, 'asl-alphabet-test')
 
@@ -66,6 +77,6 @@ if __name__ == '__main__':
 
     model = vgg11().to(device)
 
-    model.load_state_dict(torch.load('./gesture_cnn.pt', map_location=device))
+    model.load_state_dict(torch.load('./gesture_cnn_t2.pt', map_location=device))
 
     test(model, device, test_loader)

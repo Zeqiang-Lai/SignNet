@@ -1,6 +1,6 @@
 import torch
 
-from model import vgg11
+from model.vgg import vgg11
 import cv2
 import numpy as np
 
@@ -20,7 +20,7 @@ def inference(img):
     :return:
     """
     model = vgg11()
-    model.load_state_dict(torch.load('./gesture_cnn.pt', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('./gesture_cnn_t2.pt', map_location=torch.device('cpu')))
     model.eval()
 
     # Pytorch require B, C, H, W
