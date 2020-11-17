@@ -10,6 +10,7 @@ from torchvision import datasets, transforms
 from model.vgg import vgg11
 from options.train_options import TrainOptions
 from dlcommon.logger import TensorboardLogger
+from dlcommon.json import save_dict
 
 
 def train(args, model, device, train_loader, optimizer, epoch, logger=None):
@@ -92,13 +93,7 @@ def get_dataloader(use_cuda, args):
 
 
 def save_label_dict(path, dataset):
-    with open(path, 'w') as f:
-        print('Number of classes: {}'.format(len(dataset.classes)))
-        print(dataset.classes)
-        print(dataset.class_to_idx)
-        f.write(str(dataset.classes))
-        f.write('\n')
-        f.write(str(dataset.class_to_idx))
+    save_dict({'classes': dataset.classes, 'class2idx': dataset.class2idx}, path)
 
 
 def main():
@@ -109,7 +104,7 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
 
     train_loader, test_loader = get_dataloader(use_cuda, args)
-    model = vgg11().to(device)
+    model = vgg11(len(train_loader.dataset.classes)).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     start_epoch = 1
@@ -124,7 +119,7 @@ def main():
     else:
         log_dir = os.path.join(args.checkpoints_dir, args.name)
         logger = TensorboardLogger(log_dir)
-        save_label_dict(os.path.join(log_dir, 'class_map.txt'), train_loader.dataset)
+        save_label_dict(os.path.join(log_dir, 'class_map.json'), train_loader.dataset)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
     for epoch in range(start_epoch, args.epochs + 1):

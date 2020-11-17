@@ -4,7 +4,7 @@ import math
 
 class VGG(nn.Module):
 
-    def __init__(self, features):
+    def __init__(self, features, num_label):
         super(VGG, self).__init__()
         self.features = features
         self.classifier = nn.Sequential(
@@ -14,7 +14,7 @@ class VGG(nn.Module):
             nn.Dropout(),
             nn.Linear(512, 512),
             nn.ReLU(True),
-            nn.Linear(512, 29),
+            nn.Linear(512, num_label),
         )
         # Initialize weights
         for m in self.modules():
@@ -56,10 +56,10 @@ cfg = {
 }
 
 
-def vgg11():
+def vgg11(num_label):
     """VGG 11-layer model (configuration "A")"""
-    return VGG(make_layers(cfg['A']))
+    return VGG(make_layers(cfg['A']), num_label)
 
 
 if __name__ == '__main__':
-    print(vgg11())
+    print(vgg11(29))
