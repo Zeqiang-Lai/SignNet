@@ -1,44 +1,39 @@
 # organize imports
+import time
+
 import cv2
 import imutils
 import torch
+import argparse
 
 from model.vgg import vgg11
-
-classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-           'W', 'X', 'Y', 'Z', 'del', 'nothing', 'space']
-
-class2idx = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
-             'N': 13, 'O': 14, 'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24,
-             'Z': 25, 'del': 26, 'nothing': 27, 'space': 28}
-
-idx2class = dict((v, k) for k, v in class2idx.items())
+from dlcommon.json import load_dict
 
 
-def inference(img):
-    """
-    Perform inference on img
-    :param img: opencv format [height, width, channel]
-    :return:
-    """
-    model = vgg11()
-    checkpoint = torch.load('experiments/checkpoint_latest.pth', map_location=torch.device('cpu'))['model_state_dict']
-    model.load_state_dict(checkpoint)
-    model.eval()
+class SignNet:
+    def __init__(self, model_path, config_path):
+        self.model = vgg11()
+        checkpoint = torch.load(model_path, map_location=torch.device('cpu'))['model_state_dict']
+        self.model.load_state_dict(checkpoint)
+        self.model.eval()
 
-    # Pytorch require B, C, H, W   transforms.RandomHorizontalFlip(),
-    #         transforms.Grayscale(),
-    #         transforms.Resize((64, 64)),
-    #         transforms.ToTensor(),
-    torch_img = img[None, :]
-    torch_img = torch.tensor([torch_img], dtype=torch.float32)
+        config = load_dict(config_path)
+        self.classes = config['classes']
+        self.class2idx = config['class2idx']
+        self.idx2class = dict((v, k) for k, v in self.class2idx.items())
 
-    print(torch_img.shape)
-    out = model(torch_img)
-    print(out.shape)
-    label = torch.argmax(out, 1)
-    print(label.shape)
-    return label.item()
+    def inference(self, img):
+        """
+        Perform inference on img
+
+        :param img: opencv format [height, width, channel]
+        :return:
+        """
+        torch_img = img[None, :]
+        torch_img = torch.tensor([torch_img], dtype=torch.float32)
+        out = self.model(torch_img)
+        label = torch.argmax(out, 1)
+        return label.item()
 
 
 # global variables
@@ -82,36 +77,35 @@ def segment(image, threshold=15):
         return (thresholded, segmented)
 
 
-# -----------------
-# MAIN FUNCTION
-# -----------------
 if __name__ == "__main__":
-    # initialize weight for running average
-    aWeight = 0.5
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model', type=str, default='experiments/lzq/checkpoint_latest.pth')
+    parser.add_argument('--config', type=str, default='experiments/lzq/class_map.json')
+    args = parser.parse_args()
 
-    # get the reference to the webcam
     camera = cv2.VideoCapture(0)
 
     # region of interest (ROI) coordinates
     top, right, bottom, left = 50, 50, 250, 250
 
-    # initialize num of frames
+    aWeight = 0.5  # initialize weight for running average
     num_frames = 0
 
-    # out = cv2.VideoWriter('filename.avi', cv2.VideoWriter_fourcc(*'XVID'), 25, (200, 200), 0)
+    count = 0  # count of continuous identical sign
+    last_label = None  # we need to track last label to accumulate 'count'
 
-    # keep looping, until interrupted
+    # we use these two var to calculate fps
+    prev_frame_time = 0
+    new_frame_time = 0
+
+    model = SignNet(args.model, args.config)
+
     while (True):
-        # get the current frame
         (grabbed, frame) = camera.read()
 
-        # resize the frame
         frame = imutils.resize(frame, width=700)
-
-        # flip the frame so that it is not the mirror view
         frame = cv2.flip(frame, 1)
 
-        # clone the frame
         clone = frame.copy()
 
         # get the height and width of the frame
@@ -129,48 +123,47 @@ if __name__ == "__main__":
         if num_frames < 30:
             run_avg(gray, aWeight)
         else:
-            # segment the hand region
             hand = segment(gray)
 
-            # check whether hand region is segmented
             if hand is not None:
-                # if yes, unpack the thresholded image and
-                # segmented region
                 (thresholded, segmented) = hand
 
                 # draw the segmented region and display the frame
-                cv2.drawContours(clone, [segmented + (right, top)], -1, (0, 0, 255))
-                cv2.imshow("Thesholded", thresholded)
+                # cv2.drawContours(clone, [segmented + (right, top)], -1, (0, 0, 255))
+                # cv2.imshow("Thesholded", thresholded)
 
                 mask = (thresholded / 255).astype("uint8")
-
                 gray_mask = gray_origin * mask
-                print(gray_mask.shape)
+
+                label = model.inference(cv2.resize(gray_mask, (64, 64)))
+
+                if last_label == label:
+                    count += 1
+                else:
+                    last_label = label
+                    count = 0
+
+                if count > 5:
+                    print(model.idx2class[label] + str(count))
+
+                new_frame_time = time.time()
+                fps = 1 / (new_frame_time - prev_frame_time)
+                prev_frame_time = new_frame_time
+                fps = int(fps)
+
+                cv2.putText(gray_mask, str(fps), (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1, cv2.LINE_AA)
+
                 cv2.imshow('gray', gray_mask)
 
-                label = inference(cv2.resize(gray_mask, (64, 64)))
-                print(label)
-                print(idx2class[label])
-                cv2.waitKey(100)
-                # out.write(gray_mask)
-
         # draw the segmented hand
-        cv2.rectangle(clone, (left, top), (right, bottom), (0, 255, 0), 2)
+        # cv2.rectangle(clone, (left, top), (right, bottom), (0, 255, 0), 2)
 
-        # increment the number of frames
         num_frames += 1
-
-        # display the frame with segmented hand
         cv2.imshow("Video Feed", clone)
 
-        # observe the keypress by the user
         keypress = cv2.waitKey(1) & 0xFF
-
-        # if the user pressed "q", then stop looping
         if keypress == ord("q"):
             break
 
-    # free up memory
     camera.release()
-    # out.release()
     cv2.destroyAllWindows()
