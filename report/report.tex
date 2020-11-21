@@ -83,12 +83,17 @@ Beijing Institute of Technology\\
 
 \section{Related Work}
 
-	
-\blindtext
+\begin{figure*}[ht]
+\begin{center}
+\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
+\end{center}
+   \caption{Network architecture}
+\label{fig:arch}
+\end{figure*}
 
 \blindtext
 
-
+\blindtext
 
 %%%%%%%%% Model Description
 
@@ -97,14 +102,6 @@ Beijing Institute of Technology\\
 As it is mentioned before, we formulate sign language recognition task as a classification problem and we use a modified version of VGG Network \cite{simonyan2014very} to train a classifier for images with different signs. 
 
 In detail, our modifications can be summaried as followed(See figure\ref{fig:arch}). First, we reduce the size of last fully connected network from 4096 to 512. Secondly, we reduce the number of filter of the intermediate convolutional blocks. We make these modifications based on the requirement of live recognition and the assumption that VGG is way to large for the sign language recognition task, which was shown to be correct by the experiment on the ASL Dataset.
-
-\begin{figure*}[ht]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Network architecture}
-\label{fig:arch}
-\end{figure*}
 
 The exact network architecture can be described in table\ref{table:arch}. The total number of parameter is 10m approximately and the model can achieve 20+fps on an Intel Core I7 CPU.  
 
@@ -140,15 +137,27 @@ ASL Alphabet\cite{noauthor_asl_nodate} is a collection of images of alphabets fr
 
 For testing, we use another dataset - ASL Alphabet Test\cite{noauthor_asl_nodate-1}. This dataset is collected by a different person and it consists of 870 images with various background. There are 30 images for each symbol, A-Z, delete, space, and nothing and every image is 200$\times$200 8-bit photo, which is the same as it is in ASL Alphabet. 
 
+See figure\ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
+
+\begin{figure}[h]
+\begin{center}
+\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
+\end{center}
+ \caption{Preivew of ASL Alphabet and ASL Alphabet Test}
+\label{fig:asl}
+\end{figure}
+
+
 \subsection{Training Detail}
 
-We train our model with cross entropy loss. We adopt Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by 0.7 every other epoch. 
+We train our model with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
 
 During training, we randomly flip images horizontally. After that, the images are converted into grayscale and resized to 64$\times$64 to reduce computational complexity. 
 
 \subsection{Results}
 
-The training and testing result is shown in table\ref{table:result}
+The training and testing result is shown in table\ref{table:result}. We can see   that the model can overfit on the training set, but it works badly on test set. This poor performance might be the result of the lack of background variation in the training set, or the regularization on the model. In any cases, current model work 
 
 \begin{table}[h]
 \begin{center}
@@ -156,9 +165,9 @@ The training and testing result is shown in table\ref{table:result}
 \hline
 Dataset & Accuuracy \\
 \hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
+ASL Alphabet(Training) & Frumpy \\
+ASL Alphabet Test & Frobbly \\
+Our Custom Test Set & Makes one's heart Frob\\
 \hline
 \end{tabular}
 \end{center}
@@ -217,6 +226,23 @@ The key idea of this algorithm is to compute a reference background image using 
 
 \section{Conclusion}
 \blindtext
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+Dataset & Accuuracy \\
+\hline\hline
+ASL Alphabet(Training) & Frumpy \\
+ASL Alphabet Test & Frobbly \\
+Our Custom Test Set & Makes one's heart Frob\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Results.   Ours is better.}
+\label{table:result}
+\end{table}
+
 
 {\small
 \bibliographystyle{ieee_fullname}
