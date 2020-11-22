@@ -10,8 +10,8 @@ class TrainOptions(BaseOptions):
     def initialize(self, parser):
         parser = BaseOptions.initialize(self, parser)
 
-        parser.add_argument('--train-set', type=str, default='hkx_split/train')
-        parser.add_argument('--val-set', type=str, default='hkx_split/validation')
+        parser.add_argument('--train-set', type=str, default='asl_alphabet_train/asl_alphabet_train')
+        parser.add_argument('--val-set', type=str, default='asl-alphabet-test')
 
         parser.add_argument('--epochs', type=int, default=5, metavar='N',
                             help='number of epochs to train (default: 14)')

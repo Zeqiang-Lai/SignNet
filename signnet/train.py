@@ -93,7 +93,7 @@ def get_dataloader(use_cuda, args):
 
 
 def save_label_dict(path, dataset):
-    save_dict({'classes': dataset.classes, 'class2idx': dataset.class2idx}, path)
+    save_dict({'classes': dataset.classes, 'class2idx': dataset.class_to_idx}, path)
 
 
 def main():
