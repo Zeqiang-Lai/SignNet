@@ -11,6 +11,12 @@ from dlcommon.json import load_dict
 
 from model.vgg import vgg11
 
+# work around for:
+# OMP: Error #15: Initializing libiomp5.dylib, but found libiomp5.dylib already initialized.
+import os
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
 
 class SignNet:
     def __init__(self, model_path, config_path):
@@ -19,7 +25,7 @@ class SignNet:
         self.class2idx = config['class2idx']
         self.idx2class = dict((v, k) for k, v in self.class2idx.items())
 
-        self.model = vgg11(29)
+        self.model = vgg11(len(self.classes))
         checkpoint = torch.load(model_path, map_location=torch.device('cpu'))['model_state_dict']
         self.model.load_state_dict(checkpoint)
         self.model.eval()
@@ -110,7 +116,7 @@ class TextVisualizer:
             print(model.idx2class[label] + str(self.count))
 
     def show(self):
-        # cv2.putText(self.bg, self.text, (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(self.bg, self.text, (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1, cv2.LINE_AA)
         cv2.imshow('Text', self.bg)
 
 
