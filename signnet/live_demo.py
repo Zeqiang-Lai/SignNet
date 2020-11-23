@@ -153,8 +153,8 @@ class TextVisualizer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, default='experiments/lzq/checkpoint_latest.pth')
-    parser.add_argument('--config', type=str, default='experiments/lzq/class_map.json')
+    parser.add_argument('--model', type=str, default='pretrained/custom/checkpoint_latest.pth')
+    parser.add_argument('--config', type=str, default='pretrained/custom/class_map.json')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
