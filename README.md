@@ -2,7 +2,7 @@
 
 # SignNet
 
-### [Report](report/report.pdf) |[Pretrained Model]()| [Demo]()
+### [Report](report/report.pdf) |[Pretrained Model](https://drive.google.com/file/d/1NWdutIu9o8DqLA8tXTNbyiF5rw1IQK5X/view)| [Demo]()
 
 **SignNet: Recognize Alphabets in the American Sign Language in Real Time**
 
@@ -23,12 +23,10 @@ git clone https://github.com/Zeqiang-Lai/SignNet.git
 2. **Install the requirements**, see [requirement section](#requirement) for instruction.
 
 3. **Download pretrained model**
-
-```shell
-
-```
-
-4. **Run the live demo**
+   - [BaiduNetDisk](https://pan.baidu.com/s/1tjQI-qaErX0y8Cr7uKxIYw), Code:  l12u
+   - [Google Drive](https://drive.google.com/file/d/1NWdutIu9o8DqLA8tXTNbyiF5rw1IQK5X/view)
+4. **Unzip pretrained model and put it into 'signnet' directory**
+5. **Run the live demo**
 
 ```shell
 python live_demo.py
