@@ -1,12 +1,15 @@
 # organize imports
 import argparse
+import sys
 import time
 
-import cv2
 import imutils
 import numpy as np
 import torch
 import torch.nn.functional as F
+from PyQt5.QtWidgets import QApplication, QWidget, QTextEdit, QVBoxLayout
+import cv2
+
 from dlcommon.json import load_dict
 
 from model.vgg import vgg11
@@ -86,6 +89,21 @@ class FPSCounter:
         return fps
 
 
+class TextPreview(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Text Preview")
+        self.resize(300, 270)
+
+        self.textEdit = QTextEdit()
+        layout = QVBoxLayout()
+        layout.addWidget(self.textEdit)
+        self.setLayout(layout)
+
+    def set_text(self, text):
+        self.textEdit.setPlainText(text)
+
+
 class TextVisualizer:
     def __init__(self):
         self.count = 0  # count of continuous identical sign
@@ -98,6 +116,9 @@ class TextVisualizer:
         self.NOTHING = 'NOTHING'
         self.DEL = 'DEL'
         self.SPACE = 'SPACE'
+
+        self.win = TextPreview()
+        self.win.show()
 
     def add(self, label, prob):
         if self.last_label == label:
@@ -120,9 +141,7 @@ class TextVisualizer:
             print(model.idx2class[label] + str(self.count))
 
     def show(self):
-        self.bg = np.zeros((50, 400))
-        cv2.putText(self.bg, self.text, (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.imshow('Text', self.bg)
+        self.win.set_text(self.text)
 
 
 if __name__ == "__main__":
@@ -131,6 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, default='experiments/lzq/class_map.json')
     args = parser.parse_args()
 
+    app = QApplication(sys.argv)
     camera = cv2.VideoCapture(0)
     model = SignNet(args.model, args.config)
     detector = HandDetector()
@@ -180,3 +200,4 @@ if __name__ == "__main__":
 
     camera.release()
     cv2.destroyAllWindows()
+    sys.exit(app.exec_())
