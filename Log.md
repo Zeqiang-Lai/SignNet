@@ -50,6 +50,12 @@ python train.py --train-set lzq_test_imgs --val-set lzq_test_imgs --val-interval
 python train.py --train-set custom_train_mask_img --val-set custom_test_mask_img --val-interval 2 --epoch 20 --save-interval 2
 ```
 
+## 测试指令
+
+```shell
+python test.py --val-set custom_test_mask_img --resume_name Nov23_21-03-19_lzq-desktop
+```
+
 ## TODO
 
 报告：
@@ -62,12 +68,17 @@ python train.py --train-set custom_train_mask_img --val-set custom_test_mask_img
   - [x] 录制一个训练集
   - [x] 录制一个测试集
   - [ ] 写好剩余部分
-  - [ ] 制作一张示意图（和background subtraction用同一张就好）
+  - [x] 制作一张示意图（和background subtraction用同一张就好), 
+  - [ ] 29个符号的图
 - [ ] Improvement的实验部分
-  - [ ] 准确率数值结果
-  - [ ] 混淆矩阵
-  - [ ] 帧率测试
+  - [x] 准确率数值结果
+  - [x] 混淆矩阵
+  - [x] 帧率测试
 - [ ] 摘要和conclusion
+
+
+
+- [x] 训练数据集可能没有清理干净，导致S和E识别不好。
 
 ## 数据处理
 
@@ -78,4 +89,17 @@ python tmp_balance_data.py --input ../data/custom_train_mask_img --maxn 900
 python extract_img.py --input ../data/custom_test_mask --output ../data/custom_test_mask_img
 python tmp_balance_data.py --input ../data/custom_test_mask_img --maxn 300
 ```
+
+## 命令
+
+```shell
+python live_demo.py --model experiments/custom/checkpoint_latest.pth --config experiments/custom/class_map.json
+```
+
+## 手语识别判定算法
+
+- 连续一段时间都是一个字母，添加这个字母到缓冲区
+- 之后如果还是这个字母不再添加
+- 中间需要间隔一个Nothing
+- 然后再连续一段都是一个字母，就再添加一个到缓冲区
 
