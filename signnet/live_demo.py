@@ -72,16 +72,7 @@ class HandDetector:
         # threshold the diff image so that we get the foreground
         thresholded = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)[1]
 
-        # get the contours in the thresholded image
-        cnts, _ = cv2.findContours(thresholded.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        # return None, if no contours detected
-        if len(cnts) == 0:
-            return
-        else:
-            # based on contour area, get the maximum contour which is the hand
-            segmented = max(cnts, key=cv2.contourArea)
-            return (thresholded, segmented)
+        return thresholded
 
 
 class FPSCounter:
@@ -102,7 +93,11 @@ class TextVisualizer:
         self.count_threshold = 10
 
         self.text = ''
-        self.bg = np.zeros((50, 400))
+        self.last_add = ''
+
+        self.NOTHING = 'NOTHING'
+        self.DEL = 'DEL'
+        self.SPACE = 'SPACE'
 
     def add(self, label, prob):
         if self.last_label == label:
@@ -111,11 +106,21 @@ class TextVisualizer:
             self.last_label = label
             self.count = 0
 
-        if self.count > self.count_threshold:
-            self.text += model.idx2class[label]
+        current = model.idx2class[label]
+        if self.count > self.count_threshold and current != self.last_add:
+            self.last_add = current
+            if current == self.DEL:
+                self.text = self.text[:-1]
+                current = ''
+            elif current == self.SPACE:
+                current = ' '
+            elif current == self.NOTHING:
+                current = ''
+            self.text += current
             print(model.idx2class[label] + str(self.count))
 
     def show(self):
+        self.bg = np.zeros((50, 400))
         cv2.putText(self.bg, self.text, (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1, cv2.LINE_AA)
         cv2.imshow('Text', self.bg)
 
@@ -152,21 +157,19 @@ if __name__ == "__main__":
         if num_frames < 30:
             detector.init_bg(gray)
         else:
-            hand = detector.segment(gray)
-            if hand is not None:
-                (thresholded, segmented) = hand
+            thresholded = detector.segment(gray)
 
-                mask = (thresholded / 255).astype("uint8")
-                gray_mask = gray_origin * mask
+            mask = (thresholded / 255).astype("uint8")
+            gray_mask = gray_origin * mask
 
-                label, prob = model.inference(cv2.resize(gray_mask, (64, 64)))
-                visualizer.add(label, prob)
-                visualizer.show()
+            label, prob = model.inference(cv2.resize(gray_mask, (64, 64)))
+            visualizer.add(label, prob)
+            visualizer.show()
 
-                fps = fps_counter.get()
-                cv2.putText(gray_mask, str(int(fps)), (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1,
-                            cv2.LINE_AA)
-                cv2.imshow('Gray', gray_mask)
+            fps = fps_counter.get()
+            cv2.putText(gray_mask, str(int(fps)), (5, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1,
+                        cv2.LINE_AA)
+            cv2.imshow('Gray', gray_mask)
 
         num_frames += 1
         # cv2.imshow("Video Feed", frame)
