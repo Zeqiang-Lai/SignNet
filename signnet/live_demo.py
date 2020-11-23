@@ -81,12 +81,19 @@ class HandDetector:
 class FPSCounter:
     def __init__(self):
         self.prev_frame_time = 0
+        self.count = 0
+        self.acc = 0
 
     def get(self):
         new_frame_time = time.time()
         fps = 1 / (new_frame_time - self.prev_frame_time)
         self.prev_frame_time = new_frame_time
+        self.count += 1
+        self.acc += fps
         return fps
+
+    def avg_fps(self):
+        return self.acc / self.count
 
 
 class TextPreview(QWidget):
@@ -205,6 +212,7 @@ if __name__ == "__main__":
         if keypress == ord("q"):
             break
 
+    print('Average FPS: {}'.format(fps_counter.avg_fps()))
     camera.release()
     cv2.destroyAllWindows()
     sys.exit(app.exec_())
