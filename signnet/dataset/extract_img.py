@@ -5,7 +5,7 @@ import cv2
 
 
 def save_image(name, num, image, output_dir):
-    image_path = os.path.join(output_dir, str(name), '{0}{1}.jpg'.format(str(name), str(num)))
+    image_path = os.path.join(output_dir, str(name), '{}.jpg'.format(str(num)))
     cv2.imwrite(image_path, image)
 
 
