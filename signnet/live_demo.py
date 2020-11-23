@@ -93,9 +93,10 @@ class TextPreview(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Text Preview")
-        self.resize(300, 270)
+        self.resize(800, 400)
 
         self.textEdit = QTextEdit()
+        self.textEdit.setFontPointSize(70)
         layout = QVBoxLayout()
         layout.addWidget(self.textEdit)
         self.setLayout(layout)
@@ -128,7 +129,7 @@ class TextVisualizer:
             self.count = 0
 
         current = model.idx2class[label]
-        if self.count > self.count_threshold and current != self.last_add:
+        if self.count > self._get_threshold(label) and current != self.last_add:
             self.last_add = current
             if current == self.DEL:
                 self.text = self.text[:-1]
@@ -142,6 +143,12 @@ class TextVisualizer:
 
     def show(self):
         self.win.set_text(self.text)
+
+    def _get_threshold(self, label):
+        if label == self.SPACE:
+            return self.count_threshold + 5
+        else:
+            return self.count_threshold
 
 
 if __name__ == "__main__":
