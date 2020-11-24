@@ -2,7 +2,16 @@ import argparse
 import os
 import re
 
-from dlcommon.os import list_dir
+def list_dir(path):
+    """
+    Same as os.listdir, but remove any invisible file.
+    """
+    files = os.listdir(path)
+    cleaned = []
+    for file in files:
+        if not file.startswith('.'):
+            cleaned.append(file)
+    return cleaned
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
