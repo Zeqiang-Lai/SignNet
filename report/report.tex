@@ -60,6 +60,7 @@ Beijing Institute of Technology\\
    capitalized. The abstract is to be in 10-point, single-spaced type.
    Leave two blank lines after the Abstract, then begin the main text.
    Look at previous CVPR abstracts to get a feel for style and length.
+   The code has been made available at \url{https://github.com/Zeqiang-Lai/SignNet}
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
@@ -101,7 +102,7 @@ Beijing Institute of Technology\\
 
 As it is mentioned before, we formulate sign language recognition task as a classification problem and we use a modified version of VGG Network \cite{simonyan2014very} to train a classifier for images with different signs. 
 
-In detail, our modifications can be summaried as followed(See figure\ref{fig:arch}). First, we reduce the size of last fully connected network from 4096 to 512. Secondly, we reduce the number of filter of the intermediate convolutional blocks. We make these modifications based on the requirement of live recognition and the assumption that VGG is way to large for the sign language recognition task, which was shown to be correct by the experiment on the ASL Dataset.
+In detail, our modifications can be summaried as followed(See Figure \ref{fig:arch}). First, we reduce the size of last fully connected network from 4096 to 512. Secondly, we reduce the number of filter of the intermediate convolutional blocks. We make these modifications based on the requirement of live recognition and the assumption that VGG is way to large for the sign language recognition task, which was shown to be correct by the experiment on the ASL Dataset.
 
 The exact network architecture can be described in table\ref{table:arch}. The total number of parameter is 10m approximately and the model can achieve 20+fps on an Intel Core I7 CPU.  
 
@@ -129,7 +130,7 @@ FC & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
 
 \section{Vanilla Experiments}
 
-In this section, we introduce the experiments we have conducted using the model described in the previous section.
+[Need edit] In this section, we introduce the experiments we have conducted using the model described in the previous section.
 
 \subsection{ASL Dataset}
 
@@ -137,7 +138,7 @@ ASL Alphabet\cite{noauthor_asl_nodate} is a collection of images of alphabets fr
 
 For testing, we use another dataset - ASL Alphabet Test\cite{noauthor_asl_nodate-1}. This dataset is collected by a different person and it consists of 870 images with various background. There are 30 images for each symbol, A-Z, delete, space, and nothing and every image is 200$\times$200 8-bit photo, which is the same as it is in ASL Alphabet. 
 
-See figure\ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
+See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 
 \begin{figure}[h]
 \begin{center}
@@ -149,7 +150,7 @@ See figure\ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 \end{figure}
 
 
-\subsection{Training Detail}
+\subsection{Training Detail}\label{sec:training_detail}
 
 We train our model with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
 
@@ -167,7 +168,7 @@ Dataset & Accuuracy \\
 \hline\hline
 ASL Alphabet(Training) & Frumpy \\
 ASL Alphabet Test & Frobbly \\
-Our Custom Test Set & Makes one's heart Frob\\
+Our ASL Test Set & Makes one's heart Frob\\
 \hline
 \end{tabular}
 \end{center}
@@ -183,9 +184,18 @@ As a result, we decided to make a dataset on our own. In order to reduce the neg
 
 \subsection{Custom Dataset}
 
-Instead of collecting more data with different backgrounds, we choose to make a dataset without background directly, because recording dataset with diverse backgrounds is time-consuming and laborious.
+Instead of collecting more data with different backgrounds, we choose to make a dataset without background directly, because the former is generally time-consuming and laborious.
 
-In summary, we record a dataset that consists of xx hours video. The dataset is publicly available on Github.
+Similar to the ASL Alphabet, our custom dataset also consists 29 types of gestures where each type includes 900 and 300 images (200px$\times$200px) for training and testing, respectively. Background of each video is removed using a background subtraction algorithm, as it is shown in Figure \ref{fig:dataset}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{imgs/dataset.png}
+\end{center}
+   \caption{Origin, mask and grayscale hand images}
+\label{fig:dataset}
+\end{figure}
+
 
 \subsection{Background Subtraction}
 
@@ -193,39 +203,16 @@ We choose Running Average Background Subtraction algorithm to detect and remove 
 
 The key idea of this algorithm is to compute a reference background image using running average of first few frames in a video, and subtract the current image with respect to the reference background, and finally compare it with  to the certain threshold. Pixels that exceed threshold are considered to be foreground, while all the others are background.
  
- After comparison, we could get a background mask. Instead of using binary mask directly, we use the mask to remove background to get a grayscale hand image, because some signs require counting fingers to be recognized correctly. See figure. 
- 
- \begin{figure}[h]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-\end{center}
-   \caption{Origin, mask and grayscale hand images}
-\label{fig:long}
-\label{fig:onecol}
-\end{figure}
+ After comparison, we could get a background mask. Instead of using binary mask directly, we use the mask to remove background to get a grayscale hand image, because some signs require counting fingers to be recognized correctly. See Figure \ref{fig:dataset}.
 
 
 \subsection{Experiment}
 
-\blindtext
+\paragraph{Training Setting}
+With the new custom dataset, we use the same loss, optimizer, and data preprocessing techniques to train a new recognition model. (See previous section \ref{sec:training_detail} for more training detail).
 
-\begin{figure}[h]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-\end{center}
-   \caption{Confusion matrix}
-\label{fig:long}
-\label{fig:onecol}
-\end{figure}
-
-
-
-%%%%%%%%% Conclusion
-
-\section{Conclusion}
-\blindtext
+\paragraph{Quantitative Results}
+It takes about 5 epochs for the recognition model to converge and another 15 epochs for further tuning. As it is shown in Table \ref{table:result}, our model works perfectly on training set, but the test accuracy is slightly lower.
 
 \begin{table}[h]
 \begin{center}
@@ -233,15 +220,49 @@ The key idea of this algorithm is to compute a reference background image using 
 \hline
 Dataset & Accuuracy \\
 \hline\hline
-ASL Alphabet(Training) & Frumpy \\
-ASL Alphabet Test & Frobbly \\
-Our Custom Test Set & Makes one's heart Frob\\
+Custom Train & 25804/25809 (100\%) \\
+Custom Test & 7364/8700 (85\%) \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Results.   Ours is better.}
+\caption{Results on custom datasets}
 \label{table:result}
 \end{table}
+
+\paragraph{Error Analysis} Figure \ref{fig:confusion} shows the confusion matrix on the custom test set. We can observe from the figure that the majority of gestures can be recognized correctly, but there are some gestures are frequently misclassified to certain types. For example, almost all the gesture M are misclassified to N. If we have a look on the gestures of M and N (See Figure), it can be understood that our model work bad on these two ones, because they are similar to each other. In summary, our model work well on the most part of cases, but can be confused with some similar gestures, which might be improved with more training examples.
+
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=1\linewidth]{imgs/confusion}
+\end{center}
+   \caption{Confusion matrix on custom test set}
+\label{fig:confusion}
+\end{figure}
+
+\paragraph{Speed Test}
+To evaluate the run-time performance of our approach, we perform a set of experiments   
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Hardware & Platform &FPS \\
+\hline\hline
+Intel Core i7 without GPU & macOS 10.15.7 & 15.73\\
+Custom Test & d & 24\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Average FPS: tested in live demo with OpenCV.}
+\label{table:fps}
+\end{table}
+
+%%%%%%%%% Conclusion
+
+\section{Conclusion}
+\blindtext
+
 
 
 {\small
