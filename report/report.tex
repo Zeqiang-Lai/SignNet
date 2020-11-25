@@ -8,6 +8,7 @@
 \usepackage{amssymb}
 \usepackage[english]{babel}
 \usepackage{blindtext}
+\usepackage{multirow}
 
 % Include other packages here, before hyperref.
 
@@ -152,7 +153,7 @@ See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 
 \subsection{Training Detail}\label{sec:training_detail}
 
-We train our model with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
+We implement our model with Pytorch, and train it with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
 
 During training, we randomly flip images horizontally. After that, the images are converted into grayscale and resized to 64$\times$64 to reduce computational complexity. 
 
@@ -164,7 +165,7 @@ The training and testing result is shown in table\ref{table:result}. We can see 
 \begin{center}
 \begin{tabular}{|l|c|}
 \hline
-Dataset & Accuuracy \\
+Dataset & Accuracy \\
 \hline\hline
 ASL Alphabet(Training) & Frumpy \\
 ASL Alphabet Test & Frobbly \\
@@ -218,7 +219,7 @@ It takes about 5 epochs for the recognition model to converge and another 15 epo
 \begin{center}
 \begin{tabular}{|l|c|}
 \hline
-Dataset & Accuuracy \\
+Dataset & Accuracy \\
 \hline\hline
 Custom Train & 25804/25809 (100\%) \\
 Custom Test & 7364/8700 (85\%) \\
@@ -241,20 +242,21 @@ Custom Test & 7364/8700 (85\%) \\
 \end{figure}
 
 \paragraph{Speed Test}
-To evaluate the run-time performance of our approach, we perform a set of experiments   
+To evaluate the run-time performance of our approach, we perform a set of tests under different hardwares and platforms. As it is shown in Table \ref{table:fps}, our model can easily achieve real time performance both GPU and CPU where tests are conducted on a series of static images (rows of type static). To demonstrate the performance on live stream, we also implement a live script using OpenCV. The test result with such script achieve 400fps on GPU and is approximately real-time on CPU.  
 
 \begin{table}[h]
 \begin{center}
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|l|l|l|}
 \hline
-Hardware & Platform &FPS \\
-\hline\hline
-Intel Core i7 without GPU & macOS 10.15.7 & 15.73\\
-Custom Test & d & 24\\
-\hline
+Hardware              & Platform                & Type   & FPS \\ \hline\hline
+\multirow{2}{*}{Intel Core i7}   & \multirow{2}{*}{macOS 10.15.7}  & live   & 15.73  \\ \cline{3-4} 
+                      &                         & static & 81.00  \\ \hline
+\multirow{2}{*}{Nvidia RTX 2080} & \multirow{2}{*}{Windows} & live   & 90  \\ \cline{3-4} 
+                      &                         & static & 400 \\ \hline
+Nvidia GTX 1070 & Ubuntu 20.04.1 & static & 453.78 \\ \hline                    
 \end{tabular}
 \end{center}
-\caption{Average FPS: tested in live demo with OpenCV.}
+\caption{Average FPS of our model in different settings. Type "live" means it is tested using our live\_demo script which uses OpenCV to record video in real time, and type "static" means it is tested using static images.}
 \label{table:fps}
 \end{table}
 
