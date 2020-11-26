@@ -2,7 +2,7 @@
 
 # SignNet
 
-### [Report](report/report.pdf) |[Pretrained Model](https://drive.google.com/drive/folders/1nvcGXNynlo0k259ACTKcOLiGnMVcgyyF?usp=sharing)| [Demo]()
+### [Report](report/report.pdf) | [Slide](report/slide.pdf) |[Pretrained Model](https://drive.google.com/drive/folders/1nvcGXNynlo0k259ACTKcOLiGnMVcgyyF?usp=sharing)| [Demo]()
 
 **SignNet: Recognize Alphabets in the American Sign Language in Real Time**
 

@@ -80,6 +80,11 @@ python test.py --val-set custom_test_mask_img --resume_name Nov23_21-03-19_lzq-d
 
 - [x] 训练数据集可能没有清理干净，导致S和E识别不好。
 
+**Benchmark**
+
+- 编写代码测试fps，不用opencv。
+- 直接pytorch，bach_size = 1
+
 ## 数据处理
 
 ```shell
@@ -102,4 +107,12 @@ python live_demo.py --model experiments/custom/checkpoint_latest.pth --config ex
 - 之后如果还是这个字母不再添加
 - 中间需要间隔一个Nothing
 - 然后再连续一段都是一个字母，就再添加一个到缓冲区
+
+## Benchmark
+
+Raw:
+
+- 1070: Average Processing time: 0.0022036654921783797, FPS: 453.7893811694054
+
+- CPU: Average Processing time: 0.012344627818842043, FPS: 81.0068974678738
 
