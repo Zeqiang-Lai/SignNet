@@ -67,23 +67,39 @@ Beijing Institute of Technology\\
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-\blindtext
+With the continuous development of computer vision technology, new interactive technologies such as gesture recognition, face recognition, and human posture recognition have been widely used. Among them, gesture recognition is a research hotspot in the field of human-computer interaction (HCI). It is mainly used by a computer to detect, track and recognize user gestures through video input devices (cameras, etc.) to understand human intentions. The robust gesture recognition system has a positive impact on the development of many applications such as sign language recognition, robot control, and human-computer interaction.
 
-\begin{figure}[t]
+Sign language recognition is an important application field of gesture recognition. Compared with dynamic gestures, static gesture recognition is less difficult and has higher real-time performance, which can meet the real-time requirements of sign language recognition. The research object of static sign language recognition is a gesture image at a certain point in time, and the recognition result is related to the appearance features of the hand in the picture, such as position, contour, and texture. We chose American Sign Language (ASL) as our sign language recognition standard, which includes 26 different gestures of English letters (as shown in Figure \ref{fig:ref}), and also includes two different gestures for delete and space commands.
+
+\begin{figure}[h]
 \begin{center}
  \includegraphics[width=0.8\linewidth]{imgs/NIDCD-ASL-hands-2014.jpg}
 \end{center}
 \caption{Sign Language Reference}
-\label{fig:long}
+\label{fig:ref}
 \end{figure}
 
 
-\blindtext
+From the perspective of computer vision, our gesture recognition is mainly divided into four stages: 1. Collection of gesture images; 2. Segmentation of gesture images; 3. Feature extraction; 4. Gesture recognition.
+
+Through the overall framework of these four steps, we used the VGG16 Network to complete the sign language recognition task under the ASL mark.
+
+
+
 
 %%%%%%%%% Related Work
 
 
 \section{Related Work}
+
+ASL recognition is not a new computer vision problem. In the past two decades, researchers have used classifiers from various categories, which can be roughly divided into linear classifiers, neural networks and Bayesian networks.
+
+Although linear classifiers are relatively simple models and therefore easy to use, they require complex feature extraction and preprocessing methods to succeed \cite{singha2013hand} \cite{aryanie2015american}. Singha and Das used Karhunen-Loeve transform \cite{atwood2012american} to obtain 96\% accuracy on 10 categories of one-hand gesture images.
+
+Bayesian networks like Hidden Markov Models have also achieved high accuracy \cite{starner1997real} \cite{jebali2013extension}. These are particularly good at capturing temporal patterns, but they require well-defined models that have been defined before learning.
+
+Some neural networks have been used to process ASL translation [3, 6]. It can be said that the biggest advantage of neural networks is that they learn the most important classification features. So far, the most relevant work is L. Pigou et al. applied CNN to classify 20 Italian gestures in the ChaLearn 2014 humanoid gestures competition \cite{pigou2014sign}. They used Microsoft Kinect on the full-body image of the person performing the gesture, and the cross-validation accuracy reached 91.7\%. As in the case of the aforementioned 3-D gloves, Kinect can capture depth features, which helps to classify ASL signs.
+
 
 \begin{figure*}[ht]
 \begin{center}
@@ -93,9 +109,6 @@ Beijing Institute of Technology\\
 \label{fig:arch}
 \end{figure*}
 
-\blindtext
-
-\blindtext
 
 %%%%%%%%% Model Description
 
@@ -141,15 +154,13 @@ For testing, we use another dataset - ASL Alphabet Test\cite{noauthor_asl_nodate
 
 See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 
-\begin{figure}[h]
+\begin{figure*}[h]
 \begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
+\includegraphics[width=0.8\linewidth]{imgs/asl-cmp.png}
 \end{center}
- \caption{Preivew of ASL Alphabet and ASL Alphabet Test}
+\caption{Preivew of ASL Alphabet (Left) and ASL Alphabet Test (Right)}
 \label{fig:asl}
-\end{figure}
-
+\end{figure*}
 
 \subsection{Training Detail}\label{sec:training_detail}
 
@@ -167,9 +178,9 @@ The training and testing result is shown in table\ref{table:result}. We can see 
 \hline
 Dataset & Accuracy \\
 \hline\hline
-ASL Alphabet(Training) & Frumpy \\
-ASL Alphabet Test & Frobbly \\
-Our ASL Test Set & Makes one's heart Frob\\
+ASL Alphabet Train & 86906/87000 (100\%) \\
+ASL Alphabet Test & 145/870 (17\%) \\
+Our ASL Test Set & 1087/21418 (5\%) \\
 \hline
 \end{tabular}
 \end{center}
@@ -251,8 +262,8 @@ To evaluate the run-time performance of our approach, we perform a set of tests 
 Hardware              & Platform                & Type   & FPS \\ \hline\hline
 \multirow{2}{*}{Intel Core i7}   & \multirow{2}{*}{macOS 10.15.7}  & live   & 15.73  \\ \cline{3-4} 
                       &                         & static & 81.00  \\ \hline
-\multirow{2}{*}{Nvidia RTX 2080} & \multirow{2}{*}{Windows} & live   & 90  \\ \cline{3-4} 
-                      &                         & static & 400 \\ \hline
+\multirow{2}{*}{Nvidia RTX 2060} & \multirow{2}{*}{Windows 10} & live   & 31.05  \\ \cline{3-4} 
+                      &                         & static & 534.12 \\ \hline
 Nvidia GTX 1070 & Ubuntu 20.04.1 & static & 453.78 \\ \hline                    
 \end{tabular}
 \end{center}
