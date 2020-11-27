@@ -73,6 +73,50 @@ Sign language recognition is an important application field of gesture recogniti
 \label{fig:ref}
 \end{figure}
 
+\begin{figure*}[ht]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{imgs/arch}
+\end{center}
+   \caption{Network architecture}
+\label{fig:arch}
+\end{figure*}
+
+%\begin{table*}[t!]
+%\begin{center}
+%\begin{tabular}{|l|c|c|c|c|c|c|c|}
+%\hline
+%Layer Type & Channel & Kernel & Stride & Padding & Outputs & Acivation & Repeat\\
+%\hline\hline
+%Conv2d & 32 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 1\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Conv2d & 64 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 1\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Conv2d & 128 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 1\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Conv2d & 256 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 2\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Conv2d & 512 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 2\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Conv2d & 512 & 3$\times$3 & 1 & 1 & 1$\times$31$\times$3 & ReLU & 2\\
+%MaxPool2d & - & 2$\times$2 & 2 & 0 & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%Dropout & - & - & - & - & 1$\times$31$\times$3 & - & 1\\
+%Linear & 512 & - & - & - & 1$\times$31$\times$3 & ReLU & 1\\
+%Dropout & - & - & - & - & 1$\times$31$\times$3 & - & 1\\
+%Linear & 512 & - & - & - & 1$\times$31$\times$3 & ReLU & 1\\
+%Linear & 29 & - & - & - & 1$\times$31$\times$3 & - & 1\\
+%\hline
+%\hline
+%\end{tabular}
+%\end{center}
+%\caption{Detailed network configuration.}
+%\label{table:arch}
+%\end{table*}
 
 From the perspective of computer vision, our gesture recognition is mainly divided into four stages: 1. Collection of gesture images; 2. Segmentation of gesture images; 3. Feature extraction; 4. Gesture recognition.
 
@@ -95,14 +139,6 @@ Bayesian networks like Hidden Markov Models have also achieved high accuracy \ci
 Some neural networks have been used to process ASL translation [3, 6]. It can be said that the biggest advantage of neural networks is that they learn the most important classification features. So far, the most relevant work is L. Pigou et al. applied CNN to classify 20 Italian gestures in the ChaLearn 2014 humanoid gestures competition \cite{pigou2014sign}. They used Microsoft Kinect on the full-body image of the person performing the gesture, and the cross-validation accuracy reached 91.7\%. As in the case of the aforementioned 3-D gloves, Kinect can capture depth features, which helps to classify ASL signs.
 
 
-\begin{figure*}[ht]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Network architecture}
-\label{fig:arch}
-\end{figure*}
-
 
 %%%%%%%%% Model Description
 
@@ -110,43 +146,9 @@ Some neural networks have been used to process ASL translation [3, 6]. It can be
 
 As it is mentioned before, we formulate sign language recognition task as a classification problem and we use a modified version of VGG Network \cite{simonyan2014very} to train a classifier for images with different signs. 
 
-In detail, our modifications can be summaried as followed(See Figure \ref{fig:arch}). First, we reduce the size of last fully connected network from 4096 to 512. Secondly, we reduce the number of filter of the intermediate convolutional blocks. We make these modifications based on the requirement of live recognition and the assumption that VGG is way to large for the sign language recognition task, which was shown to be correct by the experiment on the ASL Dataset.
+In detail, our modifications can be summaried as followed. First, we reduce the size of last fully connected network from 4096 to 512. Secondly, we reduce the number of filter of the intermediate convolutional blocks. We make these modifications based on the requirement of live recognition and the assumption that VGG is way to large for the sign language recognition task, which was shown to be correct by the experiment on the ASL Dataset.
 
-The exact network architecture can be described in table\ref{table:arch}. The total number of parameter is 10m approximately and the model can achieve 20+fps on an Intel Core I7 CPU.  
-
-\begin{table}[h]
-\begin{center}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-Layer Type & Kernel & Stride & Outputs & Acivation \\
-\hline\hline
-Conv & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-Conv & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-Conv & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-Conv & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-Conv & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-FC & 1$\times$3 & 1 & 1$\times$31$\times$3 & ReLU\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results.  Ours is better.}
-\label{table:arch}
-\end{table}
-
-
-%%%%%%%%% Experiments
-
-\section{Vanilla Experiments}
-
-[Need edit] In this section, we introduce the experiments we have conducted using the model described in the previous section.
-
-\subsection{ASL Dataset}
-
-ASL Alphabet\cite{noauthor_asl_nodate} is a collection of images of alphabets from the American Sign Language, which is public available on Kaggle. The training data set contains 87,000 images which are 200$\times$200 pixels. There are 29 classes, of which 26 are for the letters A-Z and 3 classes for SPACE, DELETE and NOTHING. The test data set contains a mere 29 images, which is too small for an effective test.
-
-For testing, we use another dataset - ASL Alphabet Test\cite{noauthor_asl_nodate-1}. This dataset is collected by a different person and it consists of 870 images with various background. There are 30 images for each symbol, A-Z, delete, space, and nothing and every image is 200$\times$200 8-bit photo, which is the same as it is in ASL Alphabet. 
-
-See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
+The network architecture is shown in Figure \ref{fig:arch}. The total number of parameter is 10m approximately and the model can achieve nearly 15 fps on an Intel Core I7 CPU.  
 
 \begin{figure*}[h]
 \begin{center}
@@ -155,6 +157,22 @@ See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 \caption{Preivew of ASL Alphabet (Left) and ASL Alphabet Test (Right)}
 \label{fig:asl}
 \end{figure*}
+
+
+%%%%%%%%% Experiments
+
+\section{Vanilla Experiments}
+
+In this section, we introduce the vanilla experiments we have conducted in the early stage of the project.
+
+
+\subsection{ASL Dataset}
+
+ASL Alphabet\cite{noauthor_asl_nodate} is a collection of images of alphabets from the American Sign Language, which is public available on Kaggle. The training data set contains 87,000 images which are 200$\times$200 pixels. There are 29 classes, of which 26 are for the letters A-Z and 3 classes for SPACE, DELETE and NOTHING. The test data set contains a mere 29 images, which is too small for an effective test.
+
+For testing, we use another dataset - ASL Alphabet Test\cite{noauthor_asl_nodate-1}. This dataset is collected by a different person and it consists of 870 images with various background. There are 30 images for each symbol, A-Z, delete, space, and nothing and every image is 200$\times$200 8-bit photo, which is the same as it is in ASL Alphabet. 
+
+See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 
 \subsection{Training Detail}\label{sec:training_detail}
 
@@ -178,7 +196,7 @@ Our ASL Test Set & 1087/21418 (5\%) \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Results.   Ours is better.}
+\caption{Results on ASL dataset.}
 \label{table:result}
 \end{table}
 
@@ -198,7 +216,7 @@ Similar to the ASL Alphabet, our custom dataset also consists 29 types of gestur
 \begin{center}
 \includegraphics[width=0.8\linewidth]{imgs/dataset.png}
 \end{center}
-   \caption{Origin, mask and grayscale hand images}
+   \caption{Preview of custom dataset.}
 \label{fig:dataset}
 \end{figure}
 
@@ -231,7 +249,7 @@ Custom Test & 7364/8700 (85\%) \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Results on custom datasets}
+\caption{Results on custom datasets.}
 \label{table:result}
 \end{table}
 
@@ -242,7 +260,7 @@ Custom Test & 7364/8700 (85\%) \\
 \begin{center}
 \includegraphics[width=1\linewidth]{imgs/confusion}
 \end{center}
-   \caption{Confusion matrix on custom test set}
+   \caption{Confusion matrix on custom test set.}
 \label{fig:confusion}
 \end{figure}
 
