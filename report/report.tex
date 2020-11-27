@@ -54,14 +54,14 @@ Beijing Institute of Technology\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-   We propose an end to end deep learning approach for American sign language recognition task. Specifically, our deep learning architecture employs VGG network to extract latent representation of gesture images. We shrink and remove some layers in VGG so that it can run in real time on a single CPU. To address the generalization problem, we record a dataset without background using Average Background Subtraction algorithm. Evaluation results show that our method could accurately recognize gestures in the environments with clean backgrounds.
+   We propose an end to end deep learning approach called SignNet for American sign language recognition task. Specifically, our deep learning architecture employs VGG network to extract latent representation of gesture images. We shrink and remove some layers in VGG so that it can run in real time on a single CPU. To address the generalization problem, we record a dataset without background using Average Background Subtraction algorithm. Evaluation results show that our method could accurately recognize gestures in the environments with clean backgrounds.
    The code of this work has been made available at \url{https://github.com/Zeqiang-Lai/SignNet}
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-With the continuous development of computer vision technology, new interactive technologies such as gesture recognition, face recognition, and human posture recognition have been widely used. Among them, gesture recognition is a research hotspot in the field of human-computer interaction (HCI). It is mainly used by a computer to detect, track and recognize user gestures through video input devices (cameras, etc.) to understand human intentions. The robust gesture recognition system has a positive impact on the development of many applications such as sign language recognition, robot control, and human-computer interaction.
+With the continuous development of computer vision technology, new interactive technologies such as gesture recognition, face recognition, and human posture recognition have been widely used. Among them, gesture recognition is a research hotspot in the field of human-computer interaction (HCI). It is mainly used by a computer to detect, track and recognize user gestures through video input devices (cameras, \textit{etc.}) to understand human intentions. The robust gesture recognition system has a positive impact on the development of many applications such as sign language recognition, robot control, and human-computer interaction.
 
 Sign language recognition is an important application field of gesture recognition. Compared with dynamic gestures, static gesture recognition is less difficult and has higher real-time performance, which can meet the real-time requirements of sign language recognition. The research object of static sign language recognition is a gesture image at a certain point in time, and the recognition result is related to the appearance features of the hand in the picture, such as position, contour, and texture. We chose American Sign Language (ASL) as our sign language recognition standard, which includes 26 different gestures of English letters (as shown in Figure \ref{fig:ref}), and also includes two different gestures for delete and space commands.
 
@@ -176,13 +176,13 @@ See Figure \ref{fig:asl} for a preview of ASL Alphabet and ASL Alphabet Test.
 
 \subsection{Training Detail}\label{sec:training_detail}
 
-We implement our model with Pytorch, and train it with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to 0.0001 for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
+We implement our model with Pytorch, and train it with cross entropy loss and Adam optimizer\cite{kingma2014adam} with default parameters. The learning rate is set to $1\times 10^{-4}$ for the first epoch, and decayed by a ratio of 0.7 every other epoch. 
 
 During training, we randomly flip images horizontally. After that, the images are converted into grayscale and resized to 64$\times$64 to reduce computational complexity. 
 
 \subsection{Results}
 
-The training and testing result is shown in table\ref{table:result}. We can see   that the model can overfit on the training set, but it works badly on test set. This poor performance might be the result of the lack of background variation in the training set, or the regularization on the model. In any cases, current model work 
+The training and testing results are shown in table\ref{table:result}. We can see   that the model can overfit on the training set, but it works badly on test set. This poor performance might be the result of the lack of background variation in the training set, or the regularization on the model. In any cases, current model cannot work properly.
 
 \begin{table}[h]
 \begin{center}
@@ -204,7 +204,7 @@ Our ASL Test Set & 1087/21418 (5\%) \\
 
 The ASL Alphabet dataset has small background variations and it is hard to train a model that works well in real environment, which is shown in the experiments mentioned in the previous section.
 
-As a result, we decided to make a dataset on our own. In order to reduce the negative effect of background on prediction, we use background subtraction technique to remove it while recording dataset, and we use the same method to remove background in testing and inference stages. In this way, we can basically obtain a model that is able to work under limited environment.
+As a result, we decide to make a dataset on our own. In order to reduce the negative effect of background on prediction, we use background subtraction technique to remove it while recording dataset, and we use the same method to remove background in testing and inference stages. In this way, we can basically obtain a model that is able to work under limited environment.
 
 \subsection{Custom Dataset}
 
@@ -286,7 +286,9 @@ Nvidia GTX 1070 & Ubuntu 20.04.1 & static & 453.78 \\ \hline
 %%%%%%%%% Conclusion
 
 \section{Conclusion}
-\blindtext
+In this work, we propose SignNet for recognizing American sign language in real time. To address the problem of lacking background variation, which encounters poor performance, we use the background subtraction technique to remove the background in each training and testing sample. By combining the original ASL Alphabet dataset with the custom dataset collected by ourselves, our SignNet achieves the satisfactory performance within a short response time.
+
+In future, it is worth to investigating how to increase the accuracy of some confusing gestures, and improve human-computer interaction experience.
 
 
 
