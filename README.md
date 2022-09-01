@@ -49,7 +49,7 @@ conda env create -f env.yaml
 
 The gestures for the sign alphabets we used are a little **differnt** from what it is shown in the header image. Our version can be shown in the following pictures.
 
-![alphabets](imgs/alphabets.png)
+<img src="imgs/alphabets.png" width="500" />
 
 The total alphabets our model can recognitize includes **26 letters, space and delete** (control operator).
 
